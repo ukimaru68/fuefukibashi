@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <!-- Meta information -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="笛吹橋、お好み焼き、たまごサンド" />
+
+    <!-- Web page title -->
+    <title>Fuefukibashi</title>
+
+    <!-- URLの正規化 -->
+    <link rel="canonical" href="" />
+
+    <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css" />
+
+    <!-- Original styles -->
+    <link rel="stylesheet" href="./styles/global.css" />
+    <link rel="stylesheet" href="./styles/loading.css" />
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body>
+    <header>
+      <!-- header sp menu open -->
+      <div class="sp-menu-btn1">
+        <span class="material-icons" id="menu-open">menu</span>
+      </div>
+
+      <!-- header sp menu close -->
+      <div class="sp-menu-btn2">
+        <span class="material-icons" id="menu-close">close</span>
+        <nav class="sp-menu-nav">
+          <ul class="sp-menu-dtl">
+            <li>
+              <a href="./about.html">笛吹橋って？</a>
+            </li>
+            <li>
+              <a href="./service.html">メニュー</a>
+            </li>
+            <li>
+              <a href="./works.html">よくある質問</a>
+            </li>
+            <li>
+              <a href="./contact.html">アクセス</a>
+            </li>
+            <li>
+              <a href="./contact.html">お問い合わせ</a>
+            </li>
+          </ul>
+          <div class="spacer-md"></div>
+          <img src="./images/iconKuma.jpg" alt="スマホメニュー用下部アイコン" />
+        </nav>
+      </div>
+      <!-- header pc menu -->
+      <div class="pc-menu">
+        <nav>
+          <ul>
+            <li>
+              <a href="./about.html"><span>ABOUT</span>はじめての方へ</a>
+            </li>
+            <li>
+              <a href="./service.html"><span>SERVICE</span>サービス内容</a>
+            </li>
+            <li>
+              <a href="./works.html"><span>WORKS</span>制作実績</a>
+            </li>
+            <li>
+              <a href="./contact.html"><span>CONTACT</span>お問い合わせ</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- mainpage (main.css) -->
+    <section class="main"></section>
+
+    <script type="text/javascript">
+      function allclear() {
+        var myst = document.getElementsByName('myst');
+        var myen = document.getElementsByName('myen');
+        var res = document.getElementsByName('res');
+        var len = myst.length; //入力行の数
+        PLAN.allres.value = 0;
+
+        for (var i = 0; i < len; ++i) {
+          myst[i].value = '';
+          myen[i].value = '';
+          res[i].value = 0;
+        }
+      }
+
+      function calc() {
+        var myst = document.getElementsByName('myst');
+        var myen = document.getElementsByName('myen');
+        var res = document.getElementsByName('res');
+        var len = myst.length; //入力行の数
+        var total = 0;
+
+        for (var i = 0; i < len; ++i) {
+          //：記号と空白を除去し、入力欄の値に反映します。
+          stvalorg = myst[i].value.replace(/^\s+|\s+$|\:/g, '');
+          envalorg = myen[i].value.replace(/^\s+|\s+$|\:/g, '');
+          myst[i].value = stvalorg;
+          myen[i].value = envalorg;
+
+          //未入力、数値ではない、時刻逆転の３種類の場合、計算対象外にします。
+          if (
+            stvalorg == '' ||
+            envalorg == '' ||
+            isNaN(stvalorg) ||
+            isNaN(envalorg) ||
+            stvalorg > envalorg
+          ) {
+            myhr = 0;
+          } else {
+            //4桁未満の入力の場合に対応
+            stval = '0000' + stvalorg;
+            enval = '0000' + envalorg;
+
+            //時と分を2桁ずつ切り出します。
+            stmn = stval.substr(-2, 2);
+            enmn = enval.substr(-2, 2);
+            sthr = stval.substr(-4, 2);
+            enhr = enval.substr(-4, 2);
+
+            //15分単位で割り算し切り捨て後、時間単位に変換
+            myhr =
+              Math.floor(
+                ((parseInt(enhr) - parseInt(sthr)) * 60 +
+                  parseInt(enmn) -
+                  parseInt(stmn)) /
+                  15
+              ) / 4;
+
+            //1200以前に開始し、1300以降に終了した場合は1時間減。
+            if (
+              stval.substr(-4, 4) <= '1200' &&
+              enval.substr(-4, 4) >= '1300'
+            ) {
+              myhr -= 1;
+            }
+
+            //1730以前に開始し、1800以降に終了した場合は30分減。
+            if (
+              stval.substr(-4, 4) <= '1730' &&
+              enval.substr(-4, 4) >= '1800'
+            ) {
+              myhr -= 0.5;
+            }
+          }
+          res[i].value = myhr;
+          total += myhr;
+        }
+
+        PLAN.allres.value = total;
+      }
+    </script>
+
+    <form name="PLAN">
+      <table>
+        <tr>
+          <th>開始時刻</th>
+          <th>終了時刻</th>
+          <th>時間数(0.25単位)</th>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="text"
+              name="myst"
+              size="6"
+              maxlength="5"
+              tabindex="1"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              name="myen"
+              size="6"
+              maxlength="5"
+              tabindex="2"
+              onblur="calc()"
+            />
+          </td>
+          <td><input type="text" name="res" size="4" value="0" /></td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="text"
+              name="myst"
+              size="6"
+              maxlength="5"
+              tabindex="3"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              name="myen"
+              size="6"
+              maxlength="5"
+              tabindex="4"
+              onblur="calc()"
+            />
+          </td>
+          <td><input type="text" name="res" size="4" value="0" /></td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="text"
+              name="myst"
+              size="6"
+              maxlength="5"
+              tabindex="5"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              name="myen"
+              size="6"
+              maxlength="5"
+              tabindex="6"
+              onblur="calc()"
+            />
+          </td>
+          <td><input type="text" name="res" size="4" value="0" /></td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="text"
+              name="myst"
+              size="6"
+              maxlength="5"
+              tabindex="7"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              name="myen"
+              size="6"
+              maxlength="5"
+              tabindex="8"
+              onblur="calc()"
+            />
+          </td>
+          <td><input type="text" name="res" size="4" value="0" /></td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="text"
+              name="myst"
+              size="6"
+              maxlength="5"
+              tabindex="9"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              name="myen"
+              size="6"
+              maxlength="5"
+              tabindex="10"
+              onblur="calc()"
+            />
+          </td>
+          <td><input type="text" name="res" size="4" value="0" /></td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="text"
+              name="myst"
+              size="6"
+              maxlength="5"
+              tabindex="11"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              name="myen"
+              size="6"
+              maxlength="5"
+              tabindex="12"
+              onblur="calc()"
+            />
+          </td>
+          <td><input type="text" name="res" size="4" value="0" /></td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="text"
+              name="myst"
+              size="6"
+              maxlength="5"
+              tabindex="13"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              name="myen"
+              size="6"
+              maxlength="5"
+              tabindex="14"
+              onblur="calc()"
+            />
+          </td>
+          <td><input type="text" name="res" size="4" value="0" /></td>
+        </tr>
+        <tr>
+          <th colspan="2">合計：</th>
+          <td><input type="text" name="allres" size="4" value="0" /></td>
+        </tr>
+      </table>
+
+      <br />
+      <input type="button" onclick="calc()" value="再計算" tabindex="90" />
+      &nbsp;&nbsp;
+      <input type="button" onclick="allclear()" value="クリア" tabindex="99" />
+    </form>
+  </body>
+</html>
